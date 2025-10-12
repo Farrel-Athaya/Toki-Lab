@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Toki’s Lab | Metasploitable 2</title>
+    <link rel="stylesheet" href="../style/style.css" />
+    <link rel="stylesheet" href="../style/report-style.css" />
+  </head>
+  <body id="top">
+    <!-- Background efek cyber -->
+    <div class="cyber-bg">
+      <div class="cyber-gradient"></div>
+      <div class="matrix-rain" id="matrixRain"></div>
+    </div>
+    <div class="particles" id="particlesContainer"></div>
+    <div class="data-streams" id="dataStreams"></div>
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+    <div class="grid-overlay">
+      <div class="grid-lines"></div>
+      <div class="grid-glow"></div>
+    </div>
+    <div class="scanlines"></div>
+    <div class="noise-overlay"></div>
+
+    <!-- Navbar -->
+    <nav>
+      <div class="nav-container">
+        <a href="../index.html" class="logo">Toki’s Lab</a>
+        <ul class="nav-links">
+          <li><a href="../index.html#reports">Reports</a></li>
+          <li><a href="../index.html#contact">Contact</a></li>
+        </ul>
+        <div class="nav-bottom">
+          <a href="#" class="cyber-button">Access Terminal</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero -->
+    <!-- <section class="hero" style="min-height: 40vh;">
+    <div class="hero-container">
+      <h1 class="hero-title">
+        <span class="hero-nexus">Lab</span><span class="hero-flow">Report</span>
+      </h1>
+      <p class="hero-subtitle">Dokumentasi eksperimen keamanan siber.</p>
+    </div>
+  </section> -->
+
+    <!-- Isi laporan -->
+    <main class="report-wrapper">
+      <div class="report-header">
+        <h1>Eksperimen: Data Encryption</h1>
+        <p class="report-meta">
+          Penulis: <strong>Toki Monki</strong> • Tanggal:
+          <strong>12 Oktober 2025</strong> • Level: Intermediate
+        </p>
+      </div>
+
+      <section class="report-section">
+        <h2>Ringkasan</h2>
+        <p>
+          Eksperimen ini bertujuan memahami dasar-dasar enkripsi data
+          menggunakan algoritma simetris dan asimetris. Lingkungan percobaan
+          menggunakan Linux dengan Python dan OpenSSL.
+        </p>
+      </section>
+
+      <section class="report-section">
+        <h2>Tujuan</h2>
+        <ul>
+          <li>Menerapkan enkripsi AES untuk data lokal.</li>
+          <li>Menggunakan RSA untuk enkripsi kunci.</li>
+          <li>Menguji dekripsi untuk verifikasi integritas data.</li>
+        </ul>
+      </section>
+
+      <section class="report-section">
+        <h2>Langkah Percobaan</h2>
+        <pre>
+# Generate kunci RSA
+openssl genrsa -out private.pem 2048
+openssl rsa -in private.pem -outform PEM -pubout -out public.pem
+
+# Enkripsi file
+openssl rsautl -encrypt -inkey public.pem -pubin -in data.txt -out data.enc
+
+# Dekripsi file
+openssl rsautl -decrypt -inkey private.pem -in data.enc -out data_decrypted.txt
+      </pre
+        >
+      </section>
+
+      <section class="report-section">
+        <h2>Hasil dan Analisis</h2>
+        <p>
+          File berhasil dienkripsi dan didekripsi dengan benar. Proses enkripsi
+          RSA membutuhkan waktu lebih lama dibanding AES, namun memberikan
+          keamanan tambahan melalui pertukaran kunci yang aman.
+        </p>
+
+        <div class="report-images">
+          <img
+            src="images/encryption-lab1.png"
+            alt="Terminal output enkripsi"
+          />
+          <img src="images/encryption-lab2.png" alt="Hasil dekripsi" />
+        </div>
+      </section>
+
+      <section class="report-section">
+        <h2>Kesimpulan</h2>
+        <p>
+          Enkripsi hybrid (AES + RSA) memberikan keseimbangan antara performa
+          dan keamanan. Teknik ini dapat diterapkan untuk pengamanan komunikasi
+          data sensitif pada aplikasi cybersecurity modern.
+        </p>
+      </section>
+
+      <section class="report-section references">
+        <h2>Referensi</h2>
+        <ul>
+          <li>
+            Onizectus. (2025).
+            <em>Lab: Metasploitable2 — Penetration Testing</em>.
+            <a
+              href="https://onizectus.github.io/article/lab-metasploitable2-penetration-testing"
+              target="_blank"
+            >
+              https://onizectus.github.io/article/lab-metasploitable2-penetration-testing
+            </a>
+          </li>
+          <li>
+            OpenSSL Documentation.
+            <a href="https://www.openssl.org/docs/" target="_blank"
+              >https://www.openssl.org/docs/</a
+            >
+          </li>
+        </ul>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-links">
+          <a href="../index.html">Home</a>
+          <span class="footer-separator">•</span>
+          <a href="../index.html#reports">Reports</a>
+          <span class="footer-separator">•</span>
+          <a href="../index.html#contact">Contact</a>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2025 Toki’s Lab. All rights reserved.</p>
+          <p class="footer-credit">
+            Template design adapted from
+            <a href="https://templatemo.com" target="_blank" rel="noopener"
+              >TemplateMo</a
+            >
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="../scripts/scripts.js"></script>
+  </body>
+</html>
