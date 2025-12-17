@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Toki’s Lab | Snort iptables & UFW Implementation</title>
+    <link rel="stylesheet" href="../style/style.css" />
+    <link rel="stylesheet" href="../style/report-style.css" />
+  </head>
+  <body id="top">
+    <!-- Background efek cyber -->
+    <div class="cyber-bg">
+      <div class="cyber-gradient"></div>
+      <div class="matrix-rain" id="matrixRain"></div>
+    </div>
+    <div class="particles" id="particlesContainer"></div>
+    <div class="data-streams" id="dataStreams"></div>
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+    <div class="grid-overlay">
+      <div class="grid-lines"></div>
+      <div class="grid-glow"></div>
+    </div>
+    <div class="scanlines"></div>
+    <div class="noise-overlay"></div>
+
+    <!-- Navbar -->
+    <nav>
+      <div class="nav-container">
+        <a href="../index.html" class="logo">Toki’s Lab</a>
+        <ul class="nav-links">
+          <li><a href="../index.html#reports">Reports</a></li>
+          <li><a href="../index.html#about">About</a></li>
+        </ul>
+        <div class="nav-bottom">
+          <a
+            href="https://github.com/Farrel-Athaya"
+            target="_blank"
+            class="cyber-button"
+            >Access My GitHub</a
+          >
+        </div>
+      </div>
+    </nav>
+
+    <!-- Isi laporan -->
+    <main class="report-wrapper">
+      <div class="report-header">
+        <h1>
+          Eksperimen: Implementasi Firewall Linux Menggunakan iptables dan UFW
+        </h1>
+        <p class="report-meta">
+          Penulis: <strong>Toki</strong> • Tanggal:
+          <strong>5 November 2025</strong>
+        </p>
+      </div>
+
+      <section class="report-section">
+        <h2>1. Pengenalan Firewall di Linux</h2>
+        <p>
+          Firewall di Linux umumnya menggunakan
+          <strong>netfilter</strong> sebagai framework kernel, dan
+          <strong>iptables</strong> sebagai tools utama untuk mengaturnya. Untuk
+          konfigurasi yang lebih sederhana dan user-friendly, tersedia
+          <strong>UFW (Uncomplicated Firewall)</strong>.
+        </p>
+      </section>
+
+      <section class="report-section">
+        <h2>2. Menggunakan iptables (Default di Kali Linux)</h2>
+        <p><strong>Catatan:</strong></p>
+        <ul>
+          <li>
+            Secara default, Kali Linux tidak memiliki aturan firewall aktif.
+          </li>
+          <li>
+            Perintah iptables harus dijalankan sebagai <strong>root</strong>.
+          </li>
+        </ul>
+
+        <h3>a. Melihat aturan saat ini</h3>
+        <pre>sudo iptables -L</pre>
+
+        <h3>b. Izinkan koneksi localhost</h3>
+        <pre>sudo iptables -A INPUT -i lo -j ACCEPT</pre>
+
+        <h3>c. Izinkan koneksi established & related</h3>
+        <pre>
+sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+    </pre
+        >
+
+        <h3>d. Izinkan SSH (port 22)</h3>
+        <pre>sudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT</pre>
+
+        <h3>e. Blokir semua lalu lintas masuk lainnya</h3>
+        <pre>sudo iptables -A INPUT -j DROP</pre>
+
+        <p>
+          <strong>Peringatan:</strong> Jika menjalankan via SSH dan lupa membuka
+          port 22, akses bisa terputus.
+        </p>
+
+        <h3>f. Simpan aturan setelah reboot</h3>
+        <pre>
+sudo apt install iptables-persistent
+sudo netfilter-persistent save
+    </pre
+        >
+      </section>
+
+      <section class="report-section">
+        <h2>3. Menggunakan UFW (User-Friendly Firewall)</h2>
+
+        <h3>a. Instal UFW</h3>
+        <pre>
+sudo apt update
+sudo apt install ufw
+    </pre
+        >
+
+        <h3>b. Aktifkan UFW</h3>
+        <pre>sudo ufw enable</pre>
+
+        <p>
+          Default: menolak semua koneksi masuk dan mengizinkan semua koneksi
+          keluar.
+        </p>
+
+        <h3>c. Izinkan SSH</h3>
+        <pre>
+sudo ufw allow 22/tcp
+# atau
+sudo ufw allow ssh
+    </pre
+        >
+
+        <h3>d. Izinkan HTTP & HTTPS</h3>
+        <pre>
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+    </pre
+        >
+
+        <h3>e. Tolak port tertentu (contoh Telnet)</h3>
+        <pre>sudo ufw deny 23/tcp</pre>
+
+        <h3>f. Lihat status firewall</h3>
+        <pre>sudo ufw status verbose</pre>
+
+        <h3>g. Nonaktifkan UFW</h3>
+        <pre>sudo ufw disable</pre>
+      </section>
+
+      <section class="report-section">
+        <h2>4. Tips Keamanan Firewall</h2>
+        <ul>
+          <li>Jangan uji firewall via SSH tanpa membuka port 22.</li>
+          <li>
+            <code>iptables -F</code> akan menghapus semua aturan (berbahaya).
+          </li>
+          <li>
+            Pada mesin pentesting Kali, firewall sering dinonaktifkan saat
+            berada di jaringan target.
+          </li>
+        </ul>
+
+        <p><strong>GUI Firewall:</strong></p>
+        <pre>sudo apt install gufw</pre>
+      </section>
+
+      <section class="report-section">
+        <h2>5. Konfigurasi Dasar Kali Sebagai Host Harian</h2>
+        <pre>
+sudo apt install ufw
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow ssh
+sudo ufw enable
+    </pre
+        >
+      </section>
+
+      <section class="report-section">
+        <h2>6. Contoh 1: UFW – Akses Hanya dari Host-Only Subnet</h2>
+        <p><strong>Subnet:</strong> 192.168.56.0/24</p>
+        <pre>
+sudo ufw --force reset
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow from 192.168.56.0/24 to any port 22 proto tcp
+sudo ufw allow from 192.168.56.0/24 to any port 80 proto tcp
+sudo ufw allow from 192.168.56.0/24 to any port 4444 proto tcp
+sudo ufw enable
+sudo ufw status verbose
+    </pre
+        >
+      </section>
+
+      <section class="report-section">
+        <h2>7. Contoh 2: iptables – Filter Detail</h2>
+        <pre>
+sudo iptables -F
+sudo iptables -X
+
+sudo iptables -P INPUT DROP
+sudo iptables -P FORWARD DROP
+sudo iptables -P OUTPUT ACCEPT
+
+sudo iptables -A INPUT -i lo -j ACCEPT
+sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+sudo iptables -A INPUT -p tcp -s 192.168.56.1 --dport 22 -j ACCEPT
+sudo iptables -A INPUT -p icmp -s 192.168.56.1 -j ACCEPT
+
+sudo apt install iptables-persistent -y
+sudo netfilter-persistent save
+    </pre
+        >
+      </section>
+
+      <section class="report-section">
+        <h2>8. Contoh 3: Reverse Shell dari Victim Tertentu</h2>
+        <p><strong>Victim:</strong> 192.168.56.102 (port 4444)</p>
+
+        <h3>iptables</h3>
+        <pre>
+sudo iptables -A INPUT -p tcp -s 192.168.56.102 --dport 4444 -j ACCEPT
+    </pre
+        >
+
+        <h3>UFW</h3>
+        <pre>
+sudo ufw allow from 192.168.56.102 to any port 4444 proto tcp
+    </pre
+        >
+      </section>
+
+      <section class="report-section">
+        <h2>9. Pengujian Firewall</h2>
+        <p><strong>Dari host:</strong></p>
+        <pre>nmap -p 22,80,4444 192.168.56.101</pre>
+
+        <p><strong>Dari victim:</strong></p>
+        <pre>
+Test-NetConnection 192.168.56.101 -Port 4444
+# atau
+nc -zv 192.168.56.101 4444
+    </pre
+        >
+
+        <p>
+          Jika konfigurasi benar, hanya koneksi yang diizinkan yang akan
+          berhasil.
+        </p>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-bottom">
+          <p>&copy; 2025 Toki’s Lab. All rights reserved.</p>
+          <p class="footer-credit">
+            Template design adapted from
+            <a href="https://templatemo.com" target="_blank" rel="noopener"
+              >TemplateMo</a
+            >
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="../scripts/scripts.js"></script>
+  </body>
+</html>

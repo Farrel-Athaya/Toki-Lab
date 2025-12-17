@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Toki’s Lab | DNS Spoofing</title>
+    <link rel="stylesheet" href="../style/style.css" />
+    <link rel="stylesheet" href="../style/report-style.css" />
+  </head>
+  <body id="top">
+    <!-- Background efek cyber -->
+    <div class="cyber-bg">
+      <div class="cyber-gradient"></div>
+      <div class="matrix-rain" id="matrixRain"></div>
+    </div>
+    <div class="particles" id="particlesContainer"></div>
+    <div class="data-streams" id="dataStreams"></div>
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+    <div class="grid-overlay">
+      <div class="grid-lines"></div>
+      <div class="grid-glow"></div>
+    </div>
+    <div class="scanlines"></div>
+    <div class="noise-overlay"></div>
+
+    <!-- Navbar -->
+    <nav>
+      <div class="nav-container">
+        <a href="../index.html" class="logo">Toki’s Lab</a>
+        <ul class="nav-links">
+          <li><a href="../index.html#reports">Reports</a></li>
+          <li><a href="../index.html#about">About</a></li>
+        </ul>
+        <div class="nav-bottom">
+          <a
+            href="https://github.com/Farrel-Athaya"
+            target="_blank"
+            class="cyber-button"
+            >Access My GitHub</a
+          >
+        </div>
+      </div>
+    </nav>
+
+    <!-- Isi laporan -->
+    <main class="report-wrapper">
+      <div class="report-header">
+        <h1>Eksperimen : DNS Spoofing Menggunakan Ettercap</h1>
+        <p class="report-meta">
+          Penulis: <strong>Toki</strong> • Tanggal:
+          <strong>9 Novemebr 2025</strong>
+        </p>
+      </div>
+
+      <section class="report-section">
+        <h2>1. Pendahuluan</h2>
+        <p>
+          DNS Spoofing adalah teknik serangan yang memungkinkan penyerang
+          memanipulasi hasil resolusi DNS sehingga korban diarahkan ke situs
+          palsu. Serangan ini sering dikombinasikan dengan ARP Spoofing untuk
+          melakukan Man-in-the-Middle attack secara efektif.
+        </p>
+      </section>
+
+      <section class="report-section">
+        <h2>2. Tujuan Praktikum</h2>
+        <ul>
+          <li>Memahami konsep DNS Spoofing</li>
+          <li>Mengonfigurasi file DNS spoof Ettercap</li>
+          <li>Menguji pengalihan domain ke server palsu</li>
+          <li>Menganalisis risiko keamanan DNS</li>
+        </ul>
+      </section>
+
+      <section class="report-section">
+        <h2>3. Konfigurasi DNS Spoofing</h2>
+
+        <h3>3.1 Edit File etter.dns</h3>
+        <pre>
+sudo nano /etc/ettercap/etter.dns
+        </pre>
+
+        <p>Tambahkan entri berikut:</p>
+        <pre>
+www.facebook.com   A   192.168.1.50
+*.facebook.com     A   192.168.1.50
+        </pre>
+
+        <p>
+          <strong>Catatan:</strong> Gantilah IP dengan alamat server palsu yang
+          disiapkan oleh penyerang.
+        </p>
+      </section>
+
+      <section class="report-section">
+        <h2>4. Menjalankan DNS Spoofing</h2>
+
+        <pre>
+sudo ettercap -T -q -M arp -i wlan0 -P dns_spoof
+        </pre>
+
+        <ul>
+          <li><strong>-T</strong> : Text mode</li>
+          <li><strong>-M arp</strong> : ARP poisoning (MITM)</li>
+          <li><strong>-P dns_spoof</strong> : Plugin DNS spoofing</li>
+        </ul>
+      </section>
+
+      <section class="report-section">
+        <h2>5. Hasil Pengujian</h2>
+        <p>
+          Saat korban mengakses <code>www.facebook.com</code>, browser korban
+          diarahkan ke alamat IP palsu yang telah ditentukan oleh penyerang.
+        </p>
+
+        <ul>
+          <li>Resolusi DNS berhasil dimanipulasi</li>
+          <li>Korban tidak menyadari pengalihan</li>
+          <li>Lalu lintas dapat dianalisis lebih lanjut</li>
+        </ul>
+      </section>
+
+      <section class="report-section">
+        <h2>6. Analisis Keamanan</h2>
+        <p>
+          DNS Spoofing menunjukkan lemahnya sistem DNS tanpa enkripsi atau
+          validasi. Tanpa DNSSEC atau HTTPS enforcement, pengguna sangat rentan
+          terhadap pengalihan situs palsu.
+        </p>
+      </section>
+
+      <section class="report-section">
+        <h2>7. Mitigasi</h2>
+        <ul>
+          <li>Menggunakan DNSSEC</li>
+          <li>Mengaktifkan HTTPS & HSTS</li>
+          <li>Menggunakan VPN</li>
+          <li>Implementasi IDS/IPS</li>
+        </ul>
+      </section>
+
+      <section class="report-section">
+        <h2>8. Kesimpulan</h2>
+        <p>
+          Praktikum ini membuktikan bahwa DNS Spoofing dapat dilakukan dengan
+          mudah ketika penyerang telah berada di posisi MITM. Kesadaran terhadap
+          keamanan DNS menjadi faktor penting dalam melindungi pengguna
+          jaringan.
+        </p>
+      </section>
+
+      <!-- Navigation -->
+      <div class="report-navigation">
+        <a href="report-4.html" class="cyber-button">
+          ← Previous: ARP Spoofing
+        </a>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-bottom">
+          <p>&copy; 2025 Toki’s Lab. All rights reserved.</p>
+          <p class="footer-credit">
+            Template design adapted from
+            <a href="https://templatemo.com" target="_blank" rel="noopener"
+              >TemplateMo</a
+            >
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="../scripts/scripts.js"></script>
+  </body>
+</html>

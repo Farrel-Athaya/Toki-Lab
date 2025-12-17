@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Toki’s Lab | Ettercap & ARP Spoofing</title>
+    <link rel="stylesheet" href="../style/style.css" />
+    <link rel="stylesheet" href="../style/report-style.css" />
+  </head>
+  <body id="top">
+    <!-- Background efek cyber -->
+    <div class="cyber-bg">
+      <div class="cyber-gradient"></div>
+      <div class="matrix-rain" id="matrixRain"></div>
+    </div>
+    <div class="particles" id="particlesContainer"></div>
+    <div class="data-streams" id="dataStreams"></div>
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+    <div class="grid-overlay">
+      <div class="grid-lines"></div>
+      <div class="grid-glow"></div>
+    </div>
+    <div class="scanlines"></div>
+    <div class="noise-overlay"></div>
+
+    <!-- Navbar -->
+    <nav>
+      <div class="nav-container">
+        <a href="../index.html" class="logo">Toki’s Lab</a>
+        <ul class="nav-links">
+          <li><a href="../index.html#reports">Reports</a></li>
+          <li><a href="../index.html#about">About</a></li>
+        </ul>
+        <div class="nav-bottom">
+          <a
+            href="https://github.com/Farrel-Athaya"
+            target="_blank"
+            class="cyber-button"
+            >Access My GitHub</a
+          >
+        </div>
+      </div>
+    </nav>
+
+    <!-- Isi laporan -->
+    <main class="report-wrapper">
+      <div class="report-header">
+        <h1>
+          Eksperimen: Implementasi ARP Spoofing untuk Man-in-the-Middle Attack
+          pada Jaringan Lokal
+        </h1>
+        <p class="report-meta">
+          Penulis: <strong>Toki</strong> • Tanggal:
+          <strong>7 November 2025</strong>
+        </p>
+      </div>
+
+      <section class="report-section">
+        <h2>1. Pendahuluan</h2>
+        <p>
+          ARP Spoofing adalah teknik serangan pada jaringan lokal yang
+          memanfaatkan kelemahan Address Resolution Protocol (ARP) untuk
+          memposisikan penyerang sebagai perantara antara korban dan gateway.
+          Serangan ini memungkinkan penyerang melakukan pemantauan, modifikasi,
+          atau pencurian data tanpa disadari oleh korban.
+        </p>
+      </section>
+
+      <section class="report-section">
+        <h2>2. Tujuan Praktikum</h2>
+        <ul>
+          <li>Memahami konsep ARP Spoofing pada jaringan lokal</li>
+          <li>Mempelajari mekanisme Man-in-the-Middle (MITM)</li>
+          <li>Menguji penggunaan tools Ettercap dan arpspoof</li>
+          <li>Menganalisis alur lalu lintas data korban</li>
+        </ul>
+      </section>
+
+      <section class="report-section">
+        <h2>3. Lingkungan Pengujian</h2>
+        <ul>
+          <li><strong>Attacker:</strong> Kali Linux</li>
+          <li><strong>Korban:</strong> Host di jaringan lokal</li>
+          <li><strong>Gateway:</strong> Router jaringan</li>
+          <li><strong>Interface:</strong> wlan0 / eth0</li>
+        </ul>
+      </section>
+
+      <section class="report-section">
+        <h2>4. Metodologi ARP Spoofing</h2>
+        <p>
+          Penyerang mengirimkan ARP reply palsu ke korban dan gateway, sehingga
+          keduanya mengasosiasikan MAC address penyerang sebagai pihak lawan
+          komunikasi. Akibatnya, seluruh lalu lintas akan melewati mesin
+          penyerang.
+        </p>
+      </section>
+
+      <section class="report-section">
+        <h2>5. Implementasi Menggunakan Ettercap</h2>
+
+        <h3>5.1 Instalasi Ettercap</h3>
+        <pre>
+sudo apt update
+sudo apt install ettercap-text-only
+    </pre
+        >
+
+        <p>Atau versi GUI:</p>
+        <pre>sudo apt install ettercap-graphical</pre>
+
+        <h3>5.2 Menjalankan Ettercap (GUI)</h3>
+        <pre>sudo ettercap -G</pre>
+
+        <h3>5.3 Langkah Konfigurasi</h3>
+        <ol>
+          <li>Pilih menu <strong>Sniff → Unified sniffing</strong></li>
+          <li>Pilih interface (misal: wlan0)</li>
+          <li>Pilih <strong>Hosts → Scan for hosts</strong></li>
+          <li>Pilih <strong>Hosts → Host list</strong></li>
+          <li>Tandai IP korban sebagai <strong>Target 1</strong></li>
+          <li>Tandai IP gateway sebagai <strong>Target 2</strong></li>
+          <li>
+            Pilih <strong>Mitm → ARP poisoning</strong> dan centang
+            <em>Sniff remote connections</em>
+          </li>
+          <li>Pilih <strong>Start → Start sniffing</strong></li>
+        </ol>
+
+        <p>
+          Setelah aktif, seluruh lalu lintas antara korban dan internet akan
+          melewati mesin penyerang.
+        </p>
+      </section>
+
+      <section class="report-section">
+        <h2>6. Implementasi Alternatif Menggunakan arpspoof</h2>
+
+        <h3>6.1 Instalasi arpspoof</h3>
+        <pre>sudo apt install dsniff</pre>
+
+        <h3>6.2 Menjalankan ARP Spoofing ke Korban</h3>
+        <pre>
+sudo arpspoof -i wlan0 -t 192.168.1.100 192.168.1.1
+    </pre
+        >
+
+        <ul>
+          <li><strong>-i wlan0</strong> : Interface jaringan</li>
+          <li><strong>192.168.1.100</strong> : IP korban</li>
+          <li><strong>192.168.1.1</strong> : IP gateway</li>
+        </ul>
+
+        <h3>6.3 Menjalankan ARP Spoofing ke Gateway</h3>
+        <pre>
+sudo arpspoof -i wlan0 -t 192.168.1.1 192.168.1.100
+    </pre
+        >
+
+        <p>
+          Dengan dua perintah ini, penyerang berada di tengah komunikasi korban
+          dan gateway.
+        </p>
+      </section>
+
+      <section class="report-section">
+        <h2>7. Hasil Pengujian</h2>
+        <ul>
+          <li>Lalu lintas korban berhasil dialihkan ke mesin penyerang</li>
+          <li>Koneksi internet korban tetap berjalan tanpa gangguan</li>
+          <li>Data dapat dianalisis menggunakan packet sniffer</li>
+        </ul>
+      </section>
+
+      <section class="report-section">
+        <h2>8. Analisis Keamanan</h2>
+        <p>
+          ARP Spoofing menunjukkan bahwa protokol ARP tidak memiliki mekanisme
+          autentikasi. Tanpa pengamanan tambahan, jaringan lokal sangat rentan
+          terhadap serangan MITM.
+        </p>
+      </section>
+
+      <section class="report-section">
+        <h2>9. Mitigasi</h2>
+        <ul>
+          <li>Menggunakan static ARP</li>
+          <li>Mengaktifkan DHCP snooping & Dynamic ARP Inspection</li>
+          <li>Menggunakan VPN</li>
+          <li>Mengimplementasikan IDS/IPS</li>
+        </ul>
+      </section>
+
+      <section class="report-section">
+        <h2>10. Kesimpulan</h2>
+        <p>
+          Praktikum ini membuktikan bahwa ARP Spoofing dapat dilakukan dengan
+          mudah pada jaringan lokal yang tidak dilindungi. Pemahaman terhadap
+          teknik ini penting untuk meningkatkan kesadaran dan penerapan
+          mekanisme keamanan jaringan yang lebih baik.
+        </p>
+      </section>
+
+      <div class="report-navigation">
+        <a href="report-5.html" class="cyber-button"> Next → DNS Spoofing </a>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-bottom">
+          <p>&copy; 2025 Toki’s Lab. All rights reserved.</p>
+          <p class="footer-credit">
+            Template design adapted from
+            <a href="https://templatemo.com" target="_blank" rel="noopener"
+              >TemplateMo</a
+            >
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="../scripts/scripts.js"></script>
+  </body>
+</html>
