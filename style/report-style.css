@@ -80,3 +80,8 @@ pre {
   color: var(--primary-pink);
   text-decoration: underline;
 }
+
+.report-navigation {
+  margin-top: 3rem;
+  text-align: right;
+}
