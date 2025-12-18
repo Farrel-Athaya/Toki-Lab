@@ -1950,3 +1950,103 @@ nav {
   box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
   opacity: 0.5;
 }
+
+/* Container untuk tombol filter */
+.filter-container {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+}
+
+/* Style tombol filter */
+.filter-btn {
+  background: transparent;
+  border: 1px solid var(--primary-cyan);
+  color: var(--primary-cyan);
+  padding: 0.6rem 1.8rem;
+  font-family: inherit;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+}
+
+.filter-btn:hover {
+  background: rgba(0, 255, 255, 0.1);
+  box-shadow: 0 0 15px var(--primary-cyan);
+}
+
+/* Style tombol saat aktif */
+.filter-btn.active {
+  background: var(--primary-cyan);
+  color: var(--darker-bg);
+  box-shadow: 0 0 20px var(--primary-cyan);
+}
+
+/* Animasi untuk kartu yang disembunyikan */
+.report-card-large.hide {
+  display: none;
+}
+
+.report-card-large.show {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Mengatur jarak header khusus di bagian laporan */
+.reports .section-header {
+  margin-bottom: 1.5rem; /* Mengurangi jarak bawah ke tombol filter */
+}
+
+/* Mengatur jarak antara judul besar dan sub-teks */
+.reports .section-title {
+  margin-bottom: 0.5rem;
+}
+
+/* Mengatur container tombol filter */
+.filter-container {
+  display: flex;
+  justify-content: center;
+  gap: 1rem; /* Merapatkan jarak antar tombol */
+  margin-top: 0;
+  margin-bottom: 2rem; /* Jarak dari tombol ke kartu carousel */
+}
+
+/* Pastikan sub-judul tidak punya margin bawah yang tersisa */
+.reports .section-subtitle {
+  margin-bottom: 0;
+}
+
+.report-card-large.hide {
+  display: none !important;
+}
+
+.report-card-large.show {
+  display: block !important;
+  animation: fadeIn 0.4s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

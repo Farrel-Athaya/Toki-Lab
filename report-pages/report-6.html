@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Toki’s Lab | Cowrie Honeypot</title>
+    <link rel="stylesheet" href="../style/style.css" />
+    <link rel="stylesheet" href="../style/report-style.css" />
+  </head>
+  <body id="top">
+    <div class="cyber-bg">
+      <div class="cyber-gradient"></div>
+      <div class="matrix-rain" id="matrixRain"></div>
+    </div>
+    <div class="particles" id="particlesContainer"></div>
+    <div class="data-streams" id="dataStreams"></div>
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+    <div class="grid-overlay">
+      <div class="grid-lines"></div>
+      <div class="grid-glow"></div>
+    </div>
+    <div class="scanlines"></div>
+    <div class="noise-overlay"></div>
+
+    <nav>
+      <div class="nav-container">
+        <a href="../index.html" class="logo">Toki’s Lab</a>
+        <ul class="nav-links">
+          <li><a href="../index.html#reports">Reports</a></li>
+          <li><a href="../index.html#about">About</a></li>
+        </ul>
+        <div class="nav-bottom">
+          <a
+            href="https://github.com/Farrel-Athaya"
+            target="_blank"
+            class="cyber-button"
+            >Access My GitHub</a
+          >
+        </div>
+      </div>
+    </nav>
+
+    <main class="report-wrapper">
+      <div class="report-header">
+        <h1>
+          Implementasi Cowrie Honeypot untuk Monitoring Serangan SSH & Telnet
+        </h1>
+        <p class="report-meta">
+          Penulis: <strong>Toki</strong> • Tanggal:
+          <strong>10 November 2025</strong>
+        </p>
+      </div>
+
+      <section class="report-section">
+        <h2>Overview</h2>
+        <p>
+          Cowrie adalah medium to high interaction SSH dan Telnet honeypot yang
+          dirancang untuk logging brute force attacks dan shell interaction yang
+          dilakukan oleh attacker. Eksperimen ini bertujuan untuk membangun
+          infrastruktur threat intelligence guna merekam taktik, teknik, dan
+          prosedur (TTP) penyerang dalam lingkungan yang terkendali.
+        </p>
+      </section>
+
+      <section class="report-section">
+        <h2>Fitur Utama Cowrie</h2>
+        <ul>
+          <li>
+            <strong>SSH/Telnet Honeypot:</strong> Emulasi layanan SSH dan Telnet
+            fungsional.
+          </li>
+          <li>
+            <strong>Command Logging:</strong> Merekam seluruh command yang
+            dijalankan penyerang secara real-time.
+          </li>
+          <li>
+            <strong>File Download Capture:</strong> Mengamankan malware atau
+            file yang diunduh penyerang.
+          </li>
+          <li>
+            <strong>Fake File System:</strong> Menyediakan struktur direktori
+            Linux palsu yang realistis.
+          </li>
+          <li>
+            <strong>Session Recording:</strong> Kemampuan memutar ulang (replay)
+            seluruh sesi interaksi penyerang.
+          </li>
+        </ul>
+      </section>
+
+      <section class="report-section">
+        <h2>Langkah Instalasi & Setup</h2>
+        <h3>1. Persiapan Environment</h3>
+        <p>
+          Gunakan Python 3.7+ dan Git dalam lingkungan virtual environment untuk
+          keamanan.
+        </p>
+        <pre>
+# Clone Repository
+git clone -b v2.4.0 https://github.com/cowrie/cowrie
+cd cowrie
+
+# Setup Virtual Environment
+python3 -m venv cowrie-env
+source cowrie-env/bin/activate
+
+# Install Dependencies
+pip install --upgrade pip
+pip install -r requirements.txt
+pip install -e .
+        </pre>
+
+        <h3>2. Konfigurasi Dasar</h3>
+        <p>
+          Edit file <code>etc/cowrie.cfg</code> untuk mengubah identitas
+          honeypot:
+        </p>
+        <pre>
+[honeypot]
+hostname = server-prod-01
+listen_endpoints = tcp:2222:interface=0.0.0.0
+
+[output_json]
+enabled = true
+        </pre>
+
+        <h3>3. Port Forwarding (Eskalasi ke Port 22)</h3>
+        <p>
+          Agar penyerang terjebak, arahkan trafik port 22 ke port internal
+          Cowrie (2222):
+        </p>
+        <pre>
+sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222
+        </pre>
+      </section>
+
+      <section class="report-section">
+        <h2>Operasional & Management</h2>
+        <p>
+          Untuk mempermudah manajemen layanan, gunakan alias pada
+          <code>.bashrc</code>:
+        </p>
+        <pre>
+# Start/Restart Command
+cowrie start
+
+# Monitoring Log Real-time
+tail -f var/log/cowrie/cowrie.log
+        </pre>
+        <br />
+        <h4>Analisis Log JSON dengan JQ:</h4>
+        <pre>
+# Melihat login yang berhasil (success attempts)
+cat var/log/cowrie/cowrie.json | jq 'select(.eventid=="cowrie.login.success")'
+
+# Melihat input command dari attacker
+cat var/log/cowrie/cowrie.json | jq 'select(.eventid=="cowrie.command.input")'
+        </pre>
+      </section>
+
+      <section class="report-section">
+        <h2>Post-Attack Analysis</h2>
+        <h3>Replay Session TTY</h3>
+        <p>
+          Kita dapat memutar kembali apa yang diketik penyerang di terminal
+          mereka menggunakan playlog:
+        </p>
+        <pre>
+bin/playlog var/lib/cowrie/tty/[session-id]
+        </pre>
+        <br />
+        <h3>Analisis Malware</h3>
+        <p>
+          File yang diunduh oleh attacker (seperti script miner atau botnet)
+          tersimpan di direktori berikut:
+        </p>
+        <pre>ls -lh var/lib/cowrie/downloads/</pre>
+      </section>
+
+      <section class="report-section">
+        <h2>Security Best Practices</h2>
+        <ol>
+          <li>
+            <strong>Non-Root User:</strong> Jangan pernah menjalankan Cowrie
+            sebagai user root.
+          </li>
+          <li>
+            <strong>Isolation:</strong> Tempatkan honeypot di VLAN terpisah agar
+            tidak bisa melakukan pivot ke jaringan internal.
+          </li>
+          <li>
+            <strong>Monitoring:</strong> Lakukan integrasi dengan Database
+            (MySQL) atau SIEM untuk visualisasi data serangan.
+          </li>
+          <li>
+            <strong>Regular Backups:</strong> Amankan log JSON dan session TTY
+            secara berkala sebelum dihapus oleh penyerang yang cerdik.
+          </li>
+        </ol>
+      </section>
+
+      <section class="report-section references">
+        <h2>Resources</h2>
+        <ul>
+          <li>
+            <a href="https://github.com/cowrie/cowrie" target="_blank"
+              >Official Cowrie GitHub Repository</a
+            >
+          </li>
+          <li>
+            <a href="https://cowrie.readthedocs.io/" target="_blank"
+              >Cowrie Documentation</a
+            >
+          </li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-bottom">
+          <p>&copy; 2025 Toki’s Lab. All rights reserved.</p>
+          <p class="footer-credit">
+            Template design adapted from
+            <a href="https://templatemo.com" target="_blank" rel="noopener"
+              >TemplateMo</a
+            >
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="../scripts/scripts.js"></script>
+  </body>
+</html>

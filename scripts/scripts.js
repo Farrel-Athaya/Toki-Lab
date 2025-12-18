@@ -474,61 +474,136 @@ document.head.appendChild(style);
 // });
 
 // Reports Carousel
+// === INTEGRATED FILTER & CAROUSEL SYSTEM ===
+// Kode ini menggabungkan fungsi tombol Next/Prev dengan sistem Filter Matkul
 const track = document.querySelector(".carousel-track");
 const prev = document.querySelector(".carousel-btn.prev");
 const next = document.querySelector(".carousel-btn.next");
-const cards = document.querySelectorAll(".report-card-large");
 const carousel = document.querySelector(".reports-carousel");
+const filterButtons = document.querySelectorAll(".filter-btn");
 
-if (track && cards.length > 0) {
+if (track && carousel) {
   let index = 0;
 
+  // Fungsi untuk mendapatkan hanya kartu yang sedang tampil (tidak di-hide)
+  function getVisibleCards() {
+    return Array.from(document.querySelectorAll(".report-card-large")).filter(
+      (card) => !card.classList.contains("hide")
+    );
+  }
+
+  // Menghitung lebar satu kartu + gap secara akurat
   function getCardWidth() {
-    const style = window.getComputedStyle(cards[0]);
-    const gap = parseFloat(style.marginRight) || 32; // ambil gap aktual
-    return cards[0].offsetWidth + gap;
+    const visibleCards = getVisibleCards();
+    if (visibleCards.length === 0) return 0;
+    const style = window.getComputedStyle(visibleCards[0]);
+    const gap = parseFloat(style.marginRight) || 32;
+    return visibleCards[0].offsetWidth + gap;
   }
 
   function updateCarousel() {
+    const activeCards = getVisibleCards();
     const cardWidth = getCardWidth();
     const visibleWidth = carousel.offsetWidth;
-    const totalWidth = track.scrollWidth;
-    const maxTranslate = Math.max(totalWidth - visibleWidth, 0);
-    const translateX = Math.min(index * cardWidth, maxTranslate);
-    track.style.transform = `translateX(-${translateX}px)`;
 
-    // Hitung jumlah card yang terlihat
-    const visibleCards = Math.floor(visibleWidth / cardWidth);
-    const total = cards.length;
-    const maxIndex = Math.max(total - visibleCards, 0);
+    // Hitung berapa total lebar semua kartu yang aktif
+    const totalActiveWidth = activeCards.length * cardWidth;
 
-    // Sembunyikan tombol jika tidak bisa digeser
-    if (total <= visibleCards) {
-      prev.style.display = "none";
-      next.style.display = "none";
-      return;
+    // Batas maksimal geser adalah total lebar kartu dikurangi lebar layar yang terlihat
+    // Ini memastikan tidak akan ada ruang kosong di sebelah kanan kartu terakhir
+    const maxTranslate = Math.max(totalActiveWidth - visibleWidth, 0);
+
+    // Hitung posisi geser berdasarkan index
+    let translateX = index * cardWidth;
+
+    // JIKA posisi geser melebihi batas maksimal, kunci di batas maksimal
+    if (translateX > maxTranslate) {
+      translateX = maxTranslate;
     }
 
-    // Sembunyikan saat di ujung kiri/kanan
-    prev.style.display = index <= 0 ? "none" : "block";
-    next.style.display = index >= maxIndex ? "none" : "block";
+    track.style.transform = `translateX(-${translateX}px)`;
+
+    // Logika menampilkan tombol panah
+    const visibleCapacity = Math.floor(visibleWidth / cardWidth);
+
+    // Tombol Prev hilang jika sudah di paling kiri
+    prev.style.display = translateX <= 0 ? "none" : "block";
+
+    // Tombol Next hilang jika sudah mentok di paling kanan
+    next.style.display = translateX >= maxTranslate ? "none" : "block";
   }
 
+  // Perbarui juga logika klik tombol Next agar tidak "over-scroll"
   next.addEventListener("click", () => {
+    const activeCards = getVisibleCards();
     const cardWidth = getCardWidth();
-    const visibleCards = Math.floor(carousel.offsetWidth / cardWidth);
-    const total = cards.length;
-    const maxIndex = Math.max(total - visibleCards, 0);
-    if (index < maxIndex) index++;
-    updateCarousel();
+    const visibleWidth = carousel.offsetWidth;
+    const maxTranslate = Math.max(
+      activeCards.length * cardWidth - visibleWidth,
+      0
+    );
+
+    // Hanya tambah index jika posisi saat ini belum mentok kanan
+    if ((index + 1) * cardWidth <= maxTranslate + cardWidth / 2) {
+      index++;
+      updateCarousel();
+    } else {
+      // Jika klik sekali lagi akan membuat space kosong, langsung kunci ke mentok kanan
+      updateCarousel();
+    }
+  });
+
+  // --- LOGIKA FILTER ---
+  filterButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      // Ubah warna tombol filter yang aktif
+      filterButtons.forEach((btn) => btn.classList.remove("active"));
+      button.classList.add("active");
+
+      const filterValue = button.getAttribute("data-filter");
+      const allCards = document.querySelectorAll(".report-card-large");
+
+      allCards.forEach((card) => {
+        const cardCategory = card.getAttribute("data-category");
+        if (filterValue === "all" || filterValue === cardCategory) {
+          card.classList.remove("hide");
+          card.classList.add("show");
+        } else {
+          card.classList.add("hide");
+          card.classList.remove("show");
+        }
+      });
+
+      // Kembalikan ke posisi awal setiap ganti kategori
+      index = 0;
+      // Berikan jeda 50ms agar browser selesai memproses perubahan class CSS
+      setTimeout(updateCarousel, 50);
+    });
+  });
+
+  // --- LOGIKA TOMBOL NAVIGASI ---
+  next.addEventListener("click", () => {
+    const activeCards = getVisibleCards();
+    const visibleCapacity = Math.floor(carousel.offsetWidth / getCardWidth());
+    const maxIndex = Math.max(activeCards.length - visibleCapacity, 0);
+
+    if (index < maxIndex) {
+      index++;
+      updateCarousel();
+    }
   });
 
   prev.addEventListener("click", () => {
-    if (index > 0) index--;
-    updateCarousel();
+    if (index > 0) {
+      index--;
+      updateCarousel();
+    }
   });
 
+  // Pastikan carousel tetap rapi saat layar HP diputar atau di-resize
   window.addEventListener("resize", updateCarousel);
+
+  // Jalankan fungsi update saat pertama kali halaman dibuka
   updateCarousel();
 }
 // const track = document.querySelector('.carousel-track');
@@ -576,3 +651,36 @@ if (track && cards.length > 0) {
 //     window.addEventListener("resize", updateCarousel);
 //     updateCarousel();
 // }
+
+// document.addEventListener("DOMContentLoaded", function () {
+//   const filterButtons = document.querySelectorAll(".filter-btn");
+//   const cards = document.querySelectorAll(".report-card-large");
+
+//   filterButtons.forEach((button) => {
+//     button.addEventListener("click", () => {
+//       // 1. Ubah status tombol aktif
+//       filterButtons.forEach((btn) => btn.classList.remove("active"));
+//       button.classList.add("active");
+
+//       // 2. Ambil nilai filter
+//       const filterValue = button.getAttribute("data-filter");
+
+//       // 3. Filter kartu
+//       cards.forEach((card) => {
+//         const cardCategory = card.getAttribute("data-category");
+
+//         if (filterValue === "all" || filterValue === cardCategory) {
+//           card.classList.remove("hide");
+//           card.classList.add("show");
+//         } else {
+//           card.classList.add("hide");
+//           card.classList.remove("show");
+//         }
+//       });
+
+//       // 4. Reset posisi carousel ke awal setiap kali filter berubah
+//       const track = document.querySelector(".carousel-track");
+//       if (track) track.style.transform = "translateX(0)";
+//     });
+//   });
+// });

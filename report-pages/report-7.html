@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Toki’s Lab | Wazuh SIEM</title>
+    <link rel="stylesheet" href="../style/style.css" />
+    <link rel="stylesheet" href="../style/report-style.css" />
+  </head>
+  <body id="top">
+    <div class="cyber-bg">
+      <div class="cyber-gradient"></div>
+      <div class="matrix-rain" id="matrixRain"></div>
+    </div>
+    <div class="particles" id="particlesContainer"></div>
+    <div class="data-streams" id="dataStreams"></div>
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+    <div class="grid-overlay">
+      <div class="grid-lines"></div>
+      <div class="grid-glow"></div>
+    </div>
+    <div class="scanlines"></div>
+    <div class="noise-overlay"></div>
+
+    <nav>
+      <div class="nav-container">
+        <a href="../index.html" class="logo">Toki’s Lab</a>
+        <ul class="nav-links">
+          <li><a href="../index.html#reports">Reports</a></li>
+          <li><a href="../index.html#about">About</a></li>
+        </ul>
+        <div class="nav-bottom">
+          <a
+            href="https://github.com/Farrel-Athaya"
+            target="_blank"
+            class="cyber-button"
+            >Access My GitHub</a
+          >
+        </div>
+      </div>
+    </nav>
+
+    <main class="report-wrapper">
+      <div class="report-header">
+        <h1>Implementasi Wazuh SIEM & XDR untuk Deteksi Ancaman Terpadu</h1>
+        <p class="report-meta">
+          Penulis: <strong>Toki</strong> • Tanggal:
+          <strong>10 November 2025</strong>
+        </p>
+      </div>
+
+      <section class="report-section">
+        <h2>Overview</h2>
+        <p>
+          Wazuh adalah platform keamanan open-source yang menggabungkan
+          kemampuan <strong>SIEM</strong> (Security Information and Event
+          Management) dan <strong>XDR</strong> (Extended Detection and
+          Response). Eksperimen ini fokus pada pemantauan beban kerja
+          (workloads) di berbagai lingkungan untuk mendeteksi ancaman, memantau
+          integritas file, dan memastikan kepatuhan regulasi (compliance).
+        </p>
+      </section>
+
+      <section class="report-section">
+        <h2>Arsitektur Sistem</h2>
+        <p>
+          Wazuh menggunakan arsitektur berbasis agen yang terdiri dari tiga
+          komponen utama:
+        </p>
+
+        <ul>
+          <li>
+            <strong>Wazuh Manager:</strong> Server pusat yang menganalisis data
+            dan mengirimkan peringatan (alerts).
+          </li>
+          <li>
+            <strong>Wazuh Agent:</strong> Sensor ringan yang dipasang pada
+            endpoint (Linux, Windows, Cloud).
+          </li>
+          <li>
+            <strong>Elastic Stack:</strong> Mengindeks data (Elasticsearch) dan
+            memvisualisasikan data (Kibana).
+          </li>
+        </ul>
+      </section>
+
+      <section class="report-section">
+        <h2>Instalasi Komponen Utama</h2>
+        <h3>1. Konfigurasi Wazuh Manager</h3>
+        <p>
+          Menyiapkan repository dan menginstal manager beserta Filebeat untuk
+          pengiriman log.
+        </p>
+        <pre>
+# Tambahkan GPG Key & Repo
+curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | sudo gpg --import
+# Install Package
+sudo apt update && sudo apt install wazuh-manager filebeat -y
+        </pre>
+
+        <h3>2. Setup Elasticsearch & Kibana</h3>
+        <p>
+          Elasticsearch digunakan sebagai database storage, sementara Kibana
+          dilengkapi dengan <strong>Wazuh Plugin</strong> untuk dashboard
+          interaktif.
+        </p>
+        <pre>
+# Install Kibana Plugin
+sudo -u kibana /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.5.3_7.17.13-1.zip
+        </pre>
+      </section>
+
+      <section class="report-section">
+        <h2>Fitur Keamanan Utama</h2>
+
+        <h3>File Integrity Monitoring (FIM)</h3>
+        <p>
+          Mendeteksi setiap perubahan (create/modify/delete) pada direktori
+          kritis secara real-time.
+        </p>
+        <pre>
+&lt;syscheck&gt;
+  &lt;directories check_all="yes"&gt;/etc,/usr/bin,/var/www&lt;/directories&gt;
+&lt;/syscheck&gt;
+        </pre>
+
+        <h3>Vulnerability Detection</h3>
+        <p>
+          Memindai endpoint untuk menemukan software yang belum di-patch
+          berdasarkan basis data CVE terbaru.
+        </p>
+        <pre>
+&lt;vulnerability-detector&gt;
+  &lt;enabled&gt;yes&lt;/enabled&gt;
+  &lt;interval&gt;5m&lt;/interval&gt;
+&lt;/vulnerability-detector&gt;
+        </pre>
+      </section>
+
+      <section class="report-section">
+        <h2>Integrasi Pihak Ketiga</h2>
+        <p>
+          Wazuh dapat mengirimkan alert otomatis ke platform komunikasi atau
+          memverifikasi file berbahaya via VirusTotal.
+        </p>
+        <br />
+        <h4>Contoh Integrasi Slack:</h4>
+        <pre>
+&lt;integration&gt;
+  &lt;name&gt;slack&lt;/name&gt;
+  &lt;hook_url&gt;https://hooks.slack.com/services/YOUR/WEBHOOK/URL&lt;/hook_url&gt;
+  &lt;level&gt;10&lt;/level&gt;
+&lt;/integration&gt;
+        </pre>
+      </section>
+
+      <section class="report-section">
+        <h2>Kesimpulan & Troubleshooting</h2>
+        <p>
+          Selama eksperimen, ditemukan bahwa sinkronisasi versi antara Wazuh
+          Manager dan Elastic Stack sangatlah kritis. Jika Kibana tidak dapat
+          terhubung, pastikan status cluster Elasticsearch sehat:
+        </p>
+        <pre>curl -X GET "localhost:9200/_cluster/health?pretty"</pre>
+      </section>
+
+      <section class="report-section references">
+        <h2>Resources</h2>
+        <ul>
+          <li>
+            <a href="https://documentation.wazuh.com/" target="_blank"
+              >Wazuh Documentation</a
+            >
+          </li>
+          <li>
+            <a href="https://github.com/wazuh/wazuh" target="_blank"
+              >Wazuh GitHub Repository</a
+            >
+          </li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-bottom">
+          <p>&copy; 2025 Toki’s Lab. All rights reserved.</p>
+          <p class="footer-credit">
+            Template design adapted from
+            <a href="https://templatemo.com" target="_blank" rel="noopener"
+              >TemplateMo</a
+            >
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="../scripts/scripts.js"></script>
+  </body>
+</html>
